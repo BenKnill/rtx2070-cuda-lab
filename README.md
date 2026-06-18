@@ -10,8 +10,9 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 ## Blender Bridge
 
+- `docs/media/cuda_rocket_plume_scene.gif` / `.mp4` - full-scene rocket animation with the CUDA plume composited at the nozzle.
 - `docs/media/cuda_rocket_plume_blender_preview.png` - Cycles render of a procedural rocket with a CUDA-generated exhaust plume attached to the nozzle.
-- `docs/media/cuda_rocket_plume.gif` / `.mp4` - 96-frame CUDA plume animation generated under WSL.
+- `docs/media/cuda_rocket_plume.gif` / `.mp4` - raw 96-frame CUDA plume field generated under WSL.
 - `assets/blender/cuda_rocket_plume_scene.blend` - packed Blender scene containing the rocket and derived plume-card textures.
 - `assets/blender/rocket_plume_cards/` - selected CUDA plume frames prepared as Blender emission cards.
 - `docs/media/cuda_smoke_blender_bridge_preview.png` - Cycles render using CUDA smokeParticles frames as layered cloud cards.
@@ -26,6 +27,7 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 - `docs/media/smokeParticles_native_run.gif` / `.mp4` - native Windows CUDA/OpenGL volumetric smoke particle animation.
 - `docs/media/simpleGL_native_run.gif` / `.mp4` - native Windows CUDA/OpenGL VBO sine-wave animation.
 - `src/cuda/cuda_rocket_plume_kernel.cu` - WSL CUDA kernel that synthesizes rocket plume frames for Blender.
+- `scripts/wsl/wsl_make_cuda_rocket_plume_scene_animation.sh` - renders a clean Blender plate and composites the animated plume into the full rocket shot.
 - `docs/media/cuda_sim_contact.png` - contact sheet of non-windowed CUDA QA outputs.
 - `notes/cuda_care_notes.md` - RTX 2070 and CUDA 12.6 setup notes.
 - `scripts/wsl/` - WSL-first install, probe, conversion, and validation scripts.
