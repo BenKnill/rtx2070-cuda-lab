@@ -37,7 +37,7 @@ echo "== composite animated plume into scene mp4 =="
 ffmpeg -y \
   -loop 1 -framerate 24 -i "$CLEAN" \
   -framerate 24 -i "$FRAME_DIR/plume_frame_%03d.ppm" \
-  -filter_complex "[1:v]scale=780:390:flags=lanczos,colorkey=0x000000:0.055:0.20,format=rgba,colorchannelmixer=aa=0.92[plume];[0:v]scale=1400:800:flags=lanczos,format=rgba[bg];[bg][plume]overlay=x=62:y=224:shortest=1,format=yuv420p" \
+  -filter_complex "[1:v]scale=780:390:flags=lanczos,hflip,colorkey=0x000000:0.055:0.20,format=rgba,colorchannelmixer=aa=0.92[plume];[0:v]scale=1400:800:flags=lanczos,format=rgba[bg];[bg][plume]overlay=x=62:y=224:shortest=1,format=yuv420p" \
   -frames:v 96 -c:v libx264 -pix_fmt yuv420p -movflags +faststart \
   "$MEDIA/cuda_rocket_plume_scene.mp4"
 

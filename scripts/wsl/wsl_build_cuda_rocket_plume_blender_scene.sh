@@ -45,7 +45,7 @@ echo "== generate CUDA plume frames =="
 echo
 echo "== derive plume cards =="
 for idx in 006 014 022 030 038 046 054 062 070 078; do
-  ffmpeg -y -i "$FRAME_DIR/plume_frame_$idx.ppm" -vf "scale=1024:-1:flags=lanczos" "$CARD_DIR/plume_card_$idx.png"
+  ffmpeg -y -i "$FRAME_DIR/plume_frame_$idx.ppm" -vf "scale=1024:-1:flags=lanczos,hflip" "$CARD_DIR/plume_card_$idx.png"
 done
 
 echo
