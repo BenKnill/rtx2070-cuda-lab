@@ -218,6 +218,29 @@
       <section class="gallery" aria-label="CUDA sample outputs">
         <div class="feature">
           <figure>
+            <img src="media/cuda_smoke_blender_bridge_preview.png" alt="Blender Cycles scene using CUDA smokeParticles frames as layered smoke cards">
+            <figcaption>
+              <strong>Blender smoke-card bridge</strong>
+              CUDA smokeParticles frames converted into layered Blender cloud cards, lit and rendered with Cycles.
+              <div class="downloads">
+                <a class="button" href="media/cuda_smoke_blender_bridge_preview.png">PNG</a>
+                <a class="button" href="../assets/blender/cuda_smoke_cards_scene.blend">BLEND</a>
+              </div>
+            </figcaption>
+          </figure>
+          <div class="notes">
+            <h2>Blender bridge</h2>
+            <p>
+              This is the first CUDA-to-Blender asset pass: the native CUDA smoke demo becomes reusable image-card atmosphere inside a lit Blender scene.
+            </p>
+            <p>
+              The .blend packs the generated smoke-card textures so it can travel without the local capture folder.
+            </p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <figure>
             <img src="media/fluidsGL_native_run.gif" alt="Green CUDA fluidsGL animation generated from native Windows CUDA OpenGL frames">
             <figcaption>
               <strong>fluidsGL native run</strong>

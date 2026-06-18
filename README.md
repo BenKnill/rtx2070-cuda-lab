@@ -8,6 +8,12 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 [https://benknill.github.io/rtx2070-cuda-lab/](https://benknill.github.io/rtx2070-cuda-lab/)
 
+## Blender Bridge
+
+- `docs/media/cuda_smoke_blender_bridge_preview.png` - Cycles render using CUDA smokeParticles frames as layered cloud cards.
+- `assets/blender/cuda_smoke_cards_scene.blend` - packed Blender scene containing the generated smoke-card textures.
+- `assets/blender/smoke_cards/` - derived PNG cards from the CUDA smokeParticles frame capture.
+
 ## What Is Here
 
 - `docs/index.html` - the gallery page.
