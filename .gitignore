@@ -1,0 +1,10 @@
+cuda_care_logs/
+cuda_demo_output/
+cuda_samples*/
+downloads/
+*.ppm
+*.bin
+*.obj
+*.exe
+*.pdb
+*.ilk
