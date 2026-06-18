@@ -14,6 +14,7 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 - `docs/media/fluidsGL_native_run.gif` / `.mp4` - native Windows CUDA/OpenGL fluidsGL animation.
 - `docs/media/oceanFFT_native_run.gif` / `.mp4` - native Windows CUDA/CUFFT/OpenGL ocean surface animation.
 - `docs/media/smokeParticles_native_run.gif` / `.mp4` - native Windows CUDA/OpenGL volumetric smoke particle animation.
+- `docs/media/simpleGL_native_run.gif` / `.mp4` - native Windows CUDA/OpenGL VBO sine-wave animation.
 - `docs/media/cuda_sim_contact.png` - contact sheet of non-windowed CUDA QA outputs.
 - `notes/cuda_care_notes.md` - RTX 2070 and CUDA 12.6 setup notes.
 - `scripts/wsl/` - WSL-first install, probe, conversion, and validation scripts.
