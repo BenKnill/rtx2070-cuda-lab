@@ -218,6 +218,29 @@
       <section class="gallery" aria-label="CUDA sample outputs">
         <div class="feature">
           <figure>
+            <img src="media/gateway_plasma_keyframe.png" alt="Blender Cycles render of NASA Gateway and a crew module over Earth with shader-generated plasma field lines">
+            <figcaption>
+              <strong>NASA asset shader keyframe</strong>
+              Downloaded Gateway, crew module, Earth texture, and Milky Way skybox assets with procedural plasma, atmosphere, and long-exposure field shaders.
+              <div class="downloads">
+                <a class="button" href="media/gateway_plasma_keyframe.png">PNG</a>
+                <a class="button" href="../assets/blender/gateway_plasma_keyframe.blend">BLEND</a>
+              </div>
+            </figcaption>
+          </figure>
+          <div class="notes">
+            <h2>Asset shader keyframe</h2>
+            <p>
+              This is the first render from the local NASA/ESO asset library: real downloaded orbital hardware in a Cycles scene, then pushed with custom shader geometry for a plasma-docking corridor and Earth limb glow.
+            </p>
+            <p>
+              The source assets stay outside git in the local asset cache; the page ships the rendered keyframe and a packed .blend for inspection.
+            </p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <figure>
             <video autoplay loop muted playsinline poster="media/cuda_rocket_plume_blender_preview.png" aria-label="Z-aware animated Blender rocket scene with a CUDA-generated plume flickering from the nozzle">
               <source src="media/cuda_rocket_plume_zaware_scene.mp4" type="video/mp4">
             </video>

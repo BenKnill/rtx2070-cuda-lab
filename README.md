@@ -10,6 +10,9 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 ## Blender Bridge
 
+- `docs/media/gateway_plasma_keyframe.png` - Cycles/OptiX keyframe using downloaded NASA Gateway, ESAS crew module, NASA Earth texture, and ESO Milky Way skybox assets with procedural plasma/atmosphere shaders.
+- `assets/blender/gateway_plasma_keyframe.blend` - packed Blender scene for the NASA asset shader keyframe.
+- `scripts/blender/render_asset_shader_keyframe.py` - generator for the local asset-library render; expects the local `asset_library` cache outside this repo.
 - `docs/media/cuda_rocket_plume_zaware_scene.gif` / `.mp4` - z-aware Blender/Cycles rocket animation with CUDA plume cards rendered inside the scene.
 - `docs/media/cuda_rocket_plume_scene.gif` / `.mp4` - faster flat-composite full-scene rocket animation retained as a scratch/reference artifact.
 - `docs/media/cuda_rocket_plume_blender_preview.png` - Cycles render of a procedural rocket with a CUDA-generated exhaust plume attached to the nozzle.
