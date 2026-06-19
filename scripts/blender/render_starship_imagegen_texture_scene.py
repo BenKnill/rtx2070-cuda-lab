@@ -10,18 +10,21 @@ ROOT = Path("/mnt/c/Users/18572/blender-wsl-render")
 REPO = ROOT / "rtx2070-cuda-lab"
 
 SOLAR_FRAMES = ROOT / "blender_bridge_output/starship_star_window_solar_frames"
-FRAME_DIR = ROOT / "blender_bridge_output/starship_imagegen_texture_frames"
-LOCAL_OUT = ROOT / "blender_bridge_output/starship_imagegen_texture_scene"
+FRAME_DIR = Path(os.environ.get("STARSHIP_IMAGEGEN_FRAME_DIR", ROOT / "blender_bridge_output/starship_imagegen_texture_frames"))
+LOCAL_OUT = Path(os.environ.get("STARSHIP_IMAGEGEN_OUT_DIR", ROOT / "blender_bridge_output/starship_imagegen_texture_scene"))
 
-HULL_TEXTURE = ROOT / "asset_library/generated/starship_hull_wrap_imagegen.png"
-STAR_MASK = ROOT / "asset_library/generated/star_window_mask_deepfield_imagegen.png"
+HULL_TEXTURE = ROOT / "asset_library/generated/starship_hull_wrap_v2_imagegen.png"
+AFT_TEXTURE = ROOT / "asset_library/generated/starship_aft_engine_sheet_v2_imagegen.png"
+STAR_MASK = ROOT / "asset_library/generated/star_occluder_optical_alpha.png"
 
 GALLERY_MEDIA = REPO / "docs/media"
 GALLERY_ASSETS = REPO / "assets/blender"
 
 FRAME_COUNT = int(os.environ.get("STARSHIP_IMAGEGEN_FRAME_COUNT", "48"))
 SAMPLES = int(os.environ.get("STARSHIP_IMAGEGEN_SAMPLES", "36"))
+EXPORT_REPO = os.environ.get("STARSHIP_IMAGEGEN_EXPORT_REPO", "1") != "0"
 RESOLUTION = (1280, 720)
+VIEW = os.environ.get("STARSHIP_IMAGEGEN_VIEW", "hero")
 
 SHIP_OBJECTS = []
 
@@ -103,6 +106,28 @@ def make_hull_texture_material():
     return mat
 
 
+def make_aft_texture_material():
+    if not AFT_TEXTURE.exists():
+        raise FileNotFoundError(AFT_TEXTURE)
+
+    mat = bpy.data.materials.new("image-generated aft engine bay detail sheet")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    bsdf.inputs["Metallic"].default_value = 0.45
+    bsdf.inputs["Roughness"].default_value = 0.66
+
+    texcoord = nodes.new("ShaderNodeTexCoord")
+    tex = nodes.new("ShaderNodeTexImage")
+    tex.image = bpy.data.images.load(str(AFT_TEXTURE), check_existing=True)
+    tex.extension = "CLIP"
+    tex.interpolation = "Smart"
+    links.new(texcoord.outputs["UV"], tex.inputs["Vector"])
+    links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+    return mat
+
+
 def make_solar_mask_material(first_frame):
     if not STAR_MASK.exists():
         raise FileNotFoundError(STAR_MASK)
@@ -125,22 +150,20 @@ def make_solar_mask_material(first_frame):
     mask.extension = "EXTEND"
     mask.interpolation = "Closest"
 
-    separate = nodes.new("ShaderNodeSeparateColor")
-    threshold = nodes.new("ShaderNodeMath")
-    threshold.operation = "GREATER_THAN"
-    threshold.inputs[1].default_value = 0.42
+    invert_alpha = nodes.new("ShaderNodeMath")
+    invert_alpha.operation = "SUBTRACT"
+    invert_alpha.inputs[0].default_value = 1.0
     mix = nodes.new("ShaderNodeMixRGB")
     mix.inputs[1].default_value = (0.0, 0.0, 0.0, 1.0)
 
     emission = nodes.new("ShaderNodeEmission")
-    emission.inputs["Strength"].default_value = 5.2
+    emission.inputs["Strength"].default_value = 3.6
     out = nodes.new("ShaderNodeOutputMaterial")
 
     links.new(texcoord.outputs["UV"], solar.inputs["Vector"])
     links.new(texcoord.outputs["UV"], mask.inputs["Vector"])
-    links.new(mask.outputs["Color"], separate.inputs["Color"])
-    links.new(separate.outputs["Red"], threshold.inputs[0])
-    links.new(threshold.outputs["Value"], mix.inputs["Fac"])
+    links.new(mask.outputs["Alpha"], invert_alpha.inputs[1])
+    links.new(invert_alpha.outputs["Value"], mix.inputs["Fac"])
     links.new(solar.outputs["Color"], mix.inputs[2])
     links.new(mix.outputs["Color"], emission.inputs["Color"])
     links.new(emission.outputs["Emission"], out.inputs["Surface"])
@@ -171,7 +194,35 @@ def make_uv_rect(name, width, height, y, z, material):
 
 
 def add_star_mask_background(solar_material):
-    make_uv_rect("full black occlusion image mask with CUDA solar apertures", 11.6, 6.52, 2.95, 0.16, solar_material)
+    obj = make_uv_rect("camera-only black occlusion mask with CUDA solar apertures", 11.6, 6.52, 2.95, 0.16, solar_material)
+    for attr in ("visible_diffuse", "visible_glossy", "visible_transmission", "visible_volume_scatter", "visible_shadow"):
+        if hasattr(obj, attr):
+            setattr(obj, attr, False)
+    return obj
+
+
+def add_textured_disc_yz(name, x, radius, material, segments=192, z_offset=0.05):
+    verts = [(x, 0.0, z_offset)]
+    uvs = [(0.5, 0.5)]
+    for i in range(segments):
+        angle = math.tau * i / segments
+        y = math.cos(angle) * radius
+        z = math.sin(angle) * radius + z_offset
+        verts.append((x, y, z))
+        uvs.append((0.5 + y / (2.0 * radius), 0.5 + (z - z_offset) / (2.0 * radius)))
+    faces = [(0, 1 + i, 1 + ((i + 1) % segments)) for i in range(segments)]
+    mesh = bpy.data.meshes.new(name + "Mesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    for poly in mesh.polygons:
+        for loop_index in poly.loop_indices:
+            vi = mesh.loops[loop_index].vertex_index
+            uv_layer.data[loop_index].uv = uvs[vi]
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+    return append_ship(obj)
 
 
 def append_ship(obj):
@@ -293,6 +344,25 @@ def add_engine_bell(name, x, y, z, material):
     return obj
 
 
+def add_engine_cluster(engine, dark, glow):
+    aft_detail = make_aft_texture_material()
+    add_textured_disc_yz("aft six-engine bay textured plate", -3.2, 0.55, aft_detail)
+    add_cylinder_x("deep aft skirt lip", -3.23, -3.07, 0.565, dark, vertices=160, location_z=0.05)
+
+    sea_level = [(0.0, 0.045), (0.17, -0.105), (-0.17, -0.105)]
+    vacuum = [(0.0, 0.36), (0.32, -0.18), (-0.32, -0.18)]
+    for i, (y, z) in enumerate(sea_level):
+        add_cone_x(f"center raptor sea-level bell {i}", -3.58, -3.19, 0.105, 0.044, engine, vertices=80, location_y=y, location_z=z + 0.05)
+        add_cone_x(f"sea-level dark nozzle mouth {i}", -3.61, -3.57, 0.073, 0.056, dark, vertices=64, location_y=y, location_z=z + 0.05)
+    for i, (y, z) in enumerate(vacuum):
+        add_cone_x(f"outer raptor vacuum bell {i}", -3.66, -3.2, 0.17, 0.06, engine, vertices=96, location_y=y, location_z=z + 0.05)
+        add_cone_x(f"vacuum dark nozzle mouth {i}", -3.7, -3.65, 0.122, 0.096, dark, vertices=80, location_y=y, location_z=z + 0.05)
+
+    for i, y in enumerate((-0.38, -0.19, 0.0, 0.19, 0.38)):
+        add_box(f"aft plumbing strut {i}", (-3.08, y, -0.02), (0.055, 0.018, 0.62), dark)
+    add_cone_x("six-engine idle glow core", -3.83, -3.6, 0.2, 0.055, glow, vertices=80, location_z=0.02)
+
+
 def add_starship():
     hull = make_hull_texture_material()
     steel_dark = make_principled("darkened stainless fin alloy", (0.55, 0.52, 0.47, 1), roughness=0.3, metallic=1.0)
@@ -304,7 +374,7 @@ def add_starship():
     make_x_tube_mesh("Starship imagegen-wrapped cylindrical body", -2.95, 1.45, 0.5, 0.5, hull, u0=0.0, u1=0.79)
     make_x_tube_mesh("Starship imagegen-wrapped cone nose", 1.45, 2.62, 0.5, 0.045, hull, u0=0.79, u1=1.0, x_segments=18)
 
-    add_cylinder_x("aft black skirt ring", -3.12, -2.92, 0.515, black_tile, vertices=160, location_z=0.05)
+    add_cylinder_x("aft black skirt ring", -3.14, -2.9, 0.522, black_tile, vertices=160, location_z=0.05)
     add_cylinder_x("forward dark tile accent", 1.32, 1.48, 0.506, black_tile, vertices=160, location_z=0.05)
 
     add_box("left cockpit glaze", (2.0, -0.42, 0.29), (0.24, 0.016, 0.074), glass, rotation=(0, 0, math.radians(-12)))
@@ -315,9 +385,7 @@ def add_starship():
     add_fin("forward port stainless flap", 1.25, -1, 0.17, steel_dark, aft=False)
     add_fin("forward starboard stainless flap", 1.25, 1, 0.17, steel_dark, aft=False)
 
-    for iy in (-0.23, 0.0, 0.23):
-        add_engine_bell(f"raptor bell {iy:+.2f}", -3.33, iy, 0.05, engine)
-    add_cone_x("soft idle engine glow", -3.5, -3.36, 0.18, 0.055, warm_glow, vertices=64, location_z=0.05)
+    add_engine_cluster(engine, black_tile, warm_glow)
 
     root = bpy.data.objects.new("static Starship imagegen texture rig", None)
     bpy.context.collection.objects.link(root)
@@ -329,30 +397,64 @@ def add_starship():
 
 
 def add_lighting():
-    bpy.ops.object.light_add(type="AREA", location=(-3.8, -4.1, 3.2), rotation=(math.radians(62), 0, math.radians(-18)))
+    bpy.ops.object.light_add(type="AREA", location=(-3.8, -4.6, 3.4), rotation=(math.radians(62), 0, math.radians(-18)))
     key = bpy.context.object
     key.name = "long soft reflection key"
-    key.data.energy = 420
-    key.data.size = 5.0
+    key.data.energy = 560
+    key.data.size = 4.8
 
-    bpy.ops.object.light_add(type="AREA", location=(1.5, -3.2, 1.25), rotation=(math.radians(70), 0, math.radians(15)))
+    bpy.ops.object.light_add(type="AREA", location=(0.9, -3.8, 1.35), rotation=(math.radians(70), 0, math.radians(15)))
     strip = bpy.context.object
     strip.name = "thin white hull reflection strip"
-    strip.data.energy = 170
-    strip.data.size = 1.35
+    strip.data.energy = 230
+    strip.data.size = 1.15
 
-    bpy.ops.object.light_add(type="POINT", location=(3.7, 1.6, 1.7))
-    warm = bpy.context.object
-    warm.name = "warm solar aperture bounce"
-    warm.data.energy = 110
-    warm.data.color = (1.0, 0.42, 0.16)
+    bpy.ops.object.light_add(type="AREA", location=(-4.2, -2.0, 0.7), rotation=(math.radians(72), 0, math.radians(-68)))
+    aft = bpy.context.object
+    aft.name = "aft engine rim key"
+    aft.data.energy = 260
+    aft.data.size = 1.8
+    aft.data.color = (1.0, 0.78, 0.56)
 
     bpy.ops.object.light_add(type="AREA", location=(-1.6, -3.6, -1.25))
     cool = bpy.context.object
     cool.name = "cool black-side fill"
-    cool.data.energy = 62
+    cool.data.energy = 76
     cool.data.size = 3.0
     cool.data.color = (0.45, 0.58, 1.0)
+
+
+def configure_camera(scene):
+    configs = {
+        "hero": {
+            "location": (-1.05, -8.35, 1.65),
+            "target": (-0.42, 0.02, 0.12),
+            "lens": 54,
+            "focus": 8.4,
+        },
+        "aft": {
+            "location": (-4.25, -5.15, 1.15),
+            "target": (-2.95, -0.02, 0.02),
+            "lens": 64,
+            "focus": 5.8,
+        },
+        "side": {
+            "location": (0.18, -9.75, 1.2),
+            "target": (-0.18, 0.05, 0.16),
+            "lens": 46,
+            "focus": 9.6,
+        },
+    }
+    cfg = configs.get(VIEW, configs["hero"])
+    bpy.ops.object.camera_add(location=cfg["location"])
+    camera = bpy.context.object
+    camera.name = f"locked imagegen Starship camera {VIEW}"
+    camera.data.lens = cfg["lens"]
+    camera.data.dof.use_dof = True
+    camera.data.dof.focus_distance = cfg["focus"]
+    camera.data.dof.aperture_fstop = 8.5
+    look_at(camera, cfg["target"])
+    scene.camera = camera
 
 
 def cleanup_for_packing(keep_solar):
@@ -389,20 +491,13 @@ def main():
     add_starship()
     add_lighting()
 
-    bpy.ops.object.camera_add(location=(0.18, -9.75, 1.2))
-    camera = bpy.context.object
-    camera.name = "locked imagegen Starship camera"
-    camera.data.lens = 46
-    camera.data.dof.use_dof = True
-    camera.data.dof.focus_distance = 9.6
-    camera.data.dof.aperture_fstop = 9.5
-    look_at(camera, (-0.18, 0.05, 0.16))
-    scene.camera = camera
+    configure_camera(scene)
 
     FRAME_DIR.mkdir(parents=True, exist_ok=True)
     LOCAL_OUT.mkdir(parents=True, exist_ok=True)
-    GALLERY_MEDIA.mkdir(parents=True, exist_ok=True)
-    GALLERY_ASSETS.mkdir(parents=True, exist_ok=True)
+    if EXPORT_REPO:
+        GALLERY_MEDIA.mkdir(parents=True, exist_ok=True)
+        GALLERY_ASSETS.mkdir(parents=True, exist_ok=True)
 
     loaded = {}
     for frame in range(FRAME_COUNT):
@@ -416,20 +511,23 @@ def main():
     preview = FRAME_DIR / "frame_000.png"
     local_preview = LOCAL_OUT / "starship_imagegen_texture_preview.png"
     shutil.copy2(preview, local_preview)
-    shutil.copy2(preview, GALLERY_MEDIA / "starship_imagegen_texture_preview.png")
+    if EXPORT_REPO:
+        shutil.copy2(preview, GALLERY_MEDIA / "starship_imagegen_texture_preview.png")
 
     solar_node.image = bpy.data.images.load(str(first), check_existing=True)
     cleanup_for_packing(first)
     bpy.ops.file.pack_all()
     blend = LOCAL_OUT / "starship_imagegen_texture_scene.blend"
-    gallery_blend = GALLERY_ASSETS / "starship_imagegen_texture_scene.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend), compress=True)
-    shutil.copy2(blend, gallery_blend)
+    if EXPORT_REPO:
+        gallery_blend = GALLERY_ASSETS / "starship_imagegen_texture_scene.blend"
+        shutil.copy2(blend, gallery_blend)
 
     print("PREVIEW", local_preview)
     print("BLEND", blend)
-    print("GALLERY_PREVIEW", GALLERY_MEDIA / "starship_imagegen_texture_preview.png")
-    print("GALLERY_BLEND", gallery_blend)
+    if EXPORT_REPO:
+        print("GALLERY_PREVIEW", GALLERY_MEDIA / "starship_imagegen_texture_preview.png")
+        print("GALLERY_BLEND", gallery_blend)
 
 
 if __name__ == "__main__":
