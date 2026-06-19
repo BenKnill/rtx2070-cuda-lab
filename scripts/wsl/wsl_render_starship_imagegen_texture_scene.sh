@@ -21,33 +21,32 @@ fi
 
 mkdir -p "$RAW" "$PNG" "$FRAMES" "$LOCAL" "$MEDIA" "$REPO/assets/blender" "$REPO/assets/textures"
 
-if [[ ! -x "$SRC_BIN" ]]; then
-  echo "== compile CUDA stellar surface kernel =="
-  /usr/local/cuda-12.6/bin/nvcc -O3 -std=c++17 -arch=sm_75 \
-    "$ROOT/cuda_stellar_surface_kernel.cu" \
-    -o "$SRC_BIN"
-fi
+echo "== compile CUDA stellar surface kernel =="
+/usr/local/cuda-12.6/bin/nvcc -O3 -std=c++17 -arch=sm_75 \
+  "$ROOT/cuda_stellar_surface_kernel.cu" \
+  -o "$SRC_BIN"
 
-if [[ ! -f "$PNG/stellar_surface_000.png" ]]; then
-  echo "== generate CUDA solar frames =="
-  "$SRC_BIN" "$RAW" 48 1280 720
+echo
+echo "== generate CUDA solar frames =="
+rm -f "$RAW"/stellar_surface_*.ppm
+"$SRC_BIN" "$RAW" 48 1280 720
 
-  echo
-  echo "== convert solar frames to PNG =="
-  IMAGEMAGICK=$(command -v magick || command -v convert || true)
-  if [[ -z "$IMAGEMAGICK" ]]; then
-    echo "ImageMagick frontend not found: expected magick or convert" >&2
-    exit 1
-  fi
-  rm -f "$PNG"/stellar_surface_*.png
-  for f in "$RAW"/stellar_surface_*.ppm; do
-    base=$(basename "$f" .ppm)
-    "$IMAGEMAGICK" "$f" "$PNG/$base.png"
-  done
+echo
+echo "== convert solar frames to PNG =="
+IMAGEMAGICK=$(command -v magick || command -v convert || true)
+if [[ -z "$IMAGEMAGICK" ]]; then
+  echo "ImageMagick frontend not found: expected magick or convert" >&2
+  exit 1
 fi
+rm -f "$PNG"/stellar_surface_*.png
+for f in "$RAW"/stellar_surface_*.ppm; do
+  base=$(basename "$f" .ppm)
+  "$IMAGEMAGICK" "$f" "$PNG/$base.png"
+done
 
 cp "$ROOT/asset_library/generated/starship_hull_wrap_imagegen.png" "$REPO/assets/textures/starship_hull_wrap_imagegen.png"
 cp "$ROOT/asset_library/generated/star_window_mask_imagegen.png" "$REPO/assets/textures/star_window_mask_imagegen.png"
+cp "$ROOT/asset_library/generated/star_window_mask_deepfield_imagegen.png" "$REPO/assets/textures/star_window_mask_deepfield_imagegen.png"
 
 echo
 echo "== render Blender imagegen-textured Starship scene ($MODE) =="

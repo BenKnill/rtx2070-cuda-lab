@@ -14,7 +14,7 @@ FRAME_DIR = ROOT / "blender_bridge_output/starship_imagegen_texture_frames"
 LOCAL_OUT = ROOT / "blender_bridge_output/starship_imagegen_texture_scene"
 
 HULL_TEXTURE = ROOT / "asset_library/generated/starship_hull_wrap_imagegen.png"
-STAR_MASK = ROOT / "asset_library/generated/star_window_mask_imagegen.png"
+STAR_MASK = ROOT / "asset_library/generated/star_window_mask_deepfield_imagegen.png"
 
 GALLERY_MEDIA = REPO / "docs/media"
 GALLERY_ASSETS = REPO / "assets/blender"

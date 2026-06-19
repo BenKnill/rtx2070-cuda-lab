@@ -12,8 +12,9 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 - `docs/media/starship_imagegen_texture_scene.gif` / `.mp4` - static Starship-like Blender render with image-generated hull texture and animated CUDA solar-surface apertures behind a black mask.
 - `docs/media/starship_imagegen_texture_preview.png` - still preview from the same imagegen-textured Starship scene.
+- `docs/media/stellar_surface_shadertoy_preview.png` - current WIP still from the tighter Shadertoy-inspired CUDA solar-surface shader.
 - `assets/blender/starship_imagegen_texture_scene.blend` - packed Blender scene with the generated hull wrap, generated star aperture mask, and one packed CUDA solar frame.
-- `assets/textures/starship_hull_wrap_imagegen.png` / `star_window_mask_imagegen.png` - generated bitmap assets used by the Starship render.
+- `assets/textures/starship_hull_wrap_imagegen.png` / `star_window_mask_imagegen.png` / `star_window_mask_deepfield_imagegen.png` - generated bitmap assets used by the Starship render.
 - `scripts/blender/render_starship_imagegen_texture_scene.py` - Blender/Cycles scene generator for the Starship texture pass.
 - `scripts/wsl/wsl_render_starship_imagegen_texture_scene.sh` - WSL runner for CUDA frame prep, Blender render, and GIF/MP4 export.
 - `src/cuda/cuda_stellar_surface_kernel.cu` - CUDA solar-surface texture kernel used behind the star aperture mask.
