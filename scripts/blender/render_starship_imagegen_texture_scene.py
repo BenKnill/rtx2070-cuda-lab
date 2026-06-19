@@ -9,13 +9,14 @@ from mathutils import Vector
 ROOT = Path("/mnt/c/Users/18572/blender-wsl-render")
 REPO = ROOT / "rtx2070-cuda-lab"
 
-SOLAR_FRAMES = ROOT / "blender_bridge_output/starship_star_window_solar_frames"
+SOLAR_FRAMES = Path(os.environ.get("STARSHIP_SOLAR_FRAMES", ROOT / "blender_bridge_output/starship_star_window_solar_frames"))
+SOLAR_FRAME_PREFIX = os.environ.get("STARSHIP_SOLAR_FRAME_PREFIX", "stellar_surface")
 FRAME_DIR = Path(os.environ.get("STARSHIP_IMAGEGEN_FRAME_DIR", ROOT / "blender_bridge_output/starship_imagegen_texture_frames"))
 LOCAL_OUT = Path(os.environ.get("STARSHIP_IMAGEGEN_OUT_DIR", ROOT / "blender_bridge_output/starship_imagegen_texture_scene"))
 
 HULL_TEXTURE = ROOT / "asset_library/generated/starship_hull_wrap_v2_imagegen.png"
 AFT_TEXTURE = ROOT / "asset_library/generated/starship_aft_engine_sheet_v2_imagegen.png"
-STAR_MASK = ROOT / "asset_library/generated/star_occluder_optical_alpha.png"
+STAR_MASK = Path(os.environ.get("STARSHIP_MASK", ROOT / "asset_library/generated/star_occluder_optical_alpha.png"))
 
 GALLERY_MEDIA = REPO / "docs/media"
 GALLERY_ASSETS = REPO / "assets/blender"
@@ -465,7 +466,7 @@ def cleanup_for_packing(keep_solar):
 
 
 def main():
-    first = SOLAR_FRAMES / "stellar_surface_000.png"
+    first = SOLAR_FRAMES / f"{SOLAR_FRAME_PREFIX}_000.png"
     if not first.exists():
         raise FileNotFoundError(first)
 
@@ -502,7 +503,7 @@ def main():
     loaded = {}
     for frame in range(FRAME_COUNT):
         scene.frame_set(frame + 1)
-        image_path = SOLAR_FRAMES / f"stellar_surface_{frame % 48:03d}.png"
+        image_path = SOLAR_FRAMES / f"{SOLAR_FRAME_PREFIX}_{frame % 48:03d}.png"
         loaded[frame] = bpy.data.images.load(str(image_path), check_existing=True)
         solar_node.image = loaded[frame]
         scene.render.filepath = str(FRAME_DIR / f"frame_{frame:03d}.png")
