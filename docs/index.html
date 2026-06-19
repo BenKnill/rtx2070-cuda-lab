@@ -212,7 +212,7 @@
           <p class="lede">
             Small visual exports from resurrected NVIDIA CUDA sample demos on the RTX 2070 Windows/WSL render box.
           </p>
-                                                                      <p class="codex-status" id="codex-status">Codex live status: 2026-06-19 11:55:28 ET - v1 Starship still set and texture atlas v2 are published; source/tooling pushed</p>
+                                                                      <p class="codex-status" id="codex-status">Codex live status: 2026-06-19 15:35:47 ET - CUDA compute shader studies added; four-kernel tiled animation exported</p>
         </div>
         <aside class="meta" aria-label="run summary">
           <div><span>Machine</span><strong>RTX 2070</strong></div>
@@ -223,6 +223,32 @@
       </header>
 
       <section class="gallery" aria-label="CUDA sample outputs">
+        <div class="feature" id="cuda-compute-shader-studies">
+          <figure>
+            <video autoplay loop muted playsinline poster="media/cuda_compute_shader_studies_poster.png" aria-label="Four tiled CUDA compute shader studies showing accretion, aurora, caustic, and ion turbulence fields">
+              <source src="media/cuda_compute_shader_studies.mp4" type="video/mp4">
+            </video>
+            <figcaption>
+              <strong>CUDA compute shader studies</strong>
+              Four pure CUDA frame generators in one tiled pass: accretion disk, aurora current sheet, electric caustic lattice, and ion turbulence.
+              <div class="downloads">
+                <a class="button" href="media/cuda_compute_shader_studies_poster.png">PNG</a>
+                <a class="button" href="media/cuda_compute_shader_studies.gif">GIF</a>
+                <a class="button" href="media/cuda_compute_shader_studies.mp4">MP4</a>
+                <a class="button" href="../src/cuda/cuda_compute_shader_studies_kernel.cu">CUDA</a>
+              </div>
+            </figcaption>
+          </figure>
+          <div class="notes">
+            <h2>Compute shader shelf</h2>
+            <p>
+              This is the quick-look counterpart to the z-aware rocket plume: no Blender scene yet, just direct WSL CUDA pixel kernels rendered into a moving comparison sheet.
+            </p>
+            <p>
+              The best candidates can graduate into the same Blender-card or mask-reveal pipeline used by the rocket plume and Starship solar pass.
+            </p>
+          </div>
+        </div>
         <div class="feature" id="post-20260619-130747-starship-aft-v3-review">
           <figure>
             <img src="media/20260619-130747-starship-aft-v3-review_poster.png" alt="Starship aft texture v3 review">

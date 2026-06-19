@@ -10,6 +10,10 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 ## Blender Bridge
 
+- `docs/media/cuda_compute_shader_studies.gif` / `.mp4` - four tiled WSL CUDA compute shader studies: accretion disk, aurora current sheet, electric caustic lattice, and ion turbulence.
+- `docs/media/cuda_compute_shader_studies_poster.png` - still poster for the compute shader study sheet.
+- `src/cuda/cuda_compute_shader_studies_kernel.cu` - standalone CUDA pixel-kernel gallery used for the compute shader studies.
+- `scripts/wsl/wsl_render_cuda_compute_shader_studies.sh` - WSL runner that compiles the study kernel and exports PNG/GIF/MP4 gallery media.
 - `docs/media/starship_imagegen_texture_scene.gif` / `.mp4` - static Starship-like Blender render with image-generated hull texture and animated CUDA solar-surface apertures behind a black mask.
 - `docs/media/starship_imagegen_texture_preview.png` - still preview from the same imagegen-textured Starship scene.
 - `docs/media/stellar_surface_shadertoy_preview.png` - current WIP still from the tighter Shadertoy-inspired CUDA solar-surface shader.
