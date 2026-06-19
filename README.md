@@ -10,6 +10,13 @@ The practical page lives in `docs/index.html`. GitHub's raw-file preview is avai
 
 ## Blender Bridge
 
+- `docs/media/starship_imagegen_texture_scene.gif` / `.mp4` - static Starship-like Blender render with image-generated hull texture and animated CUDA solar-surface apertures behind a black mask.
+- `docs/media/starship_imagegen_texture_preview.png` - still preview from the same imagegen-textured Starship scene.
+- `assets/blender/starship_imagegen_texture_scene.blend` - packed Blender scene with the generated hull wrap, generated star aperture mask, and one packed CUDA solar frame.
+- `assets/textures/starship_hull_wrap_imagegen.png` / `star_window_mask_imagegen.png` - generated bitmap assets used by the Starship render.
+- `scripts/blender/render_starship_imagegen_texture_scene.py` - Blender/Cycles scene generator for the Starship texture pass.
+- `scripts/wsl/wsl_render_starship_imagegen_texture_scene.sh` - WSL runner for CUDA frame prep, Blender render, and GIF/MP4 export.
+- `src/cuda/cuda_stellar_surface_kernel.cu` - CUDA solar-surface texture kernel used behind the star aperture mask.
 - `docs/media/gateway_plasma_keyframe.png` - Cycles/OptiX keyframe using downloaded NASA Gateway, ESAS crew module, NASA Earth texture, and ESO Milky Way skybox assets with procedural plasma/atmosphere shaders.
 - `assets/blender/gateway_plasma_keyframe.blend` - packed Blender scene for the NASA asset shader keyframe.
 - `scripts/blender/render_asset_shader_keyframe.py` - generator for the local asset-library render; expects the local `asset_library` cache outside this repo.

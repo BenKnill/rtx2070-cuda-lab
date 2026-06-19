@@ -218,6 +218,33 @@
       <section class="gallery" aria-label="CUDA sample outputs">
         <div class="feature">
           <figure>
+            <video autoplay loop muted playsinline poster="media/starship_imagegen_texture_preview.png" aria-label="Static image-generated Starship-like vehicle with moving CUDA solar texture visible through stylized star apertures">
+              <source src="media/starship_imagegen_texture_scene.mp4" type="video/mp4">
+            </video>
+            <figcaption>
+              <strong>Imagegen Starship solar mask</strong>
+              AI-generated hull and aperture-mask textures wrapped onto a procedural Blender vehicle, with a WSL CUDA solar shader animated behind the black mask.
+              <div class="downloads">
+                <a class="button" href="media/starship_imagegen_texture_preview.png">PNG</a>
+                <a class="button" href="media/starship_imagegen_texture_scene.gif">GIF</a>
+                <a class="button" href="media/starship_imagegen_texture_scene.mp4">MP4</a>
+                <a class="button" href="../assets/blender/starship_imagegen_texture_scene.blend">BLEND</a>
+              </div>
+            </figcaption>
+          </figure>
+          <div class="notes">
+            <h2>Starship texture pass</h2>
+            <p>
+              The ship is deliberately static for keyframe use: the motion comes from CUDA-generated solar-surface frames revealed only through image-generated star-shaped holes in a full black occluder.
+            </p>
+            <p>
+              The stainless hull wrap and the aperture mask came from generated bitmap assets, then Blender handles the UV wrap, metallic shader response, reflections, and final Cycles/OptiX render.
+            </p>
+          </div>
+        </div>
+
+        <div class="feature">
+          <figure>
             <img src="media/gateway_plasma_keyframe.png" alt="Blender Cycles render of NASA Gateway and a crew module over Earth with shader-generated plasma field lines">
             <figcaption>
               <strong>NASA asset shader keyframe</strong>
